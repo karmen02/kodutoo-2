@@ -1,8 +1,53 @@
+
+// firebase asjad 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC3_sEDhF9TzZBqeXHL1iOI-TpzX1bxJKI",
+  authDomain: "kodunetoo-83d8c.firebaseapp.com",
+  projectId: "kodunetoo-83d8c",
+  storageBucket: "kodunetoo-83d8c.firebasestorage.app",
+  messagingSenderId: "939766190214",
+  appId: "1:939766190214:web:897c49fb15c85bdb2e8107",
+  databaseURL: "https://kodunetoo-83d8c-default-rtdb.europe-west1.firebasedatabase.app"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+export const db = getDatabase(app); 
+
+async function login() {
+    const provider = new GoogleAuthProvider();
+    try {
+        const result = await signInWithPopup(auth, provider);
+        console.log("Sisse logitud:", result.user.displayName);
+       
+        document.getElementById("loginContainer").style.display = "none";
+        let fullName=result.user.displayName;
+        let nameParts=fullName.split(" ");
+        let shortName=fullName;
+        
+        //nime lühendamine et kõik ei teaks täisnime kui see on TOPis
+        if (nameParts.length > 1){
+            shortName=nameParts[0] + " " + nameParts[nameParts.length - 1].charAt(0) + ".";
+        }
+        
+        return shortName;
+    } catch (error) {
+        console.log("Login error:", error);
+        return "Sisse logimine ei töötanud! Proovi uuesti!";
+    }
+}
+//_----------------------//
+
+
 console.log("Fail õigesti ühendatud");
 
 class Typer{
-    constructor(){
-        this.name = "";
+    constructor(playerName){
+        this.name = playerName;
         this.wordsInGame = 1;
         this.startingWordLength = 2;
         this.startTime = 0;
@@ -18,69 +63,40 @@ class Typer{
         this.loadFromFile();
     }
 
-    loadResults(){
-        const resultDiv = document.getElementById("results");
-        resultDiv.innerHTML = "";
-
-        for(let i=0; i < this.results.length; i++){
-            const row = document.createElement("div");
-            row.textContent = `${i+1}. ${this.results[i].name} ${this.results[i].time}`;
-            resultDiv.appendChild(row);
-        }
-    }
-
     async loadFromFile(){
         console.log("load from file sees");
         const responseFromFile = await fetch("lemmad2013.txt");
         const allWords = await responseFromFile.text();
-        this.loadResultsFromFile();
-
         this.getWords(allWords);
     }
-
-    async loadResultsFromFile(){
-        const resultsResponse = await fetch("database.txt");
-        const resultsText = await resultsResponse.text();
-        let content = JSON.parse(resultsText).content;
-
-        console.log(content);
-
-        this.results = JSON.parse(content) || [];
-        this.loadResults();
-        this.saveResult();
-    }
-
+    
     getWords(data){
-        //console.log(data);
         const dataFromFile = data.split("\n");
         this.separateWordsByLength(dataFromFile);
     }
-
+    //separateWordsByLength aitas korrektseks teha AI promptiga: mu js: (js kood). Mulle ei viska ette "Mäng läbi kirja" miks?
     separateWordsByLength(words){
         for (let word of words){
+            word = word.trim(); 
+            
             const wordLength = word.length;
+            
+            
+            if (wordLength === 0) continue; 
+
             if(!this.words[wordLength]){
                 this.words[wordLength] = []
             }
             this.words[wordLength].push(word);
-            //[["a", "b"], ["as", "nm"]]
         }
 
         console.log(this.words);
-        this.askName();
+        this.startCountdown();
     }
 
-    askName(){
-        document.getElementById("submitname").addEventListener('click', () => {
-           console.log(document.getElementById("username").value);
-           this.name = document.getElementById("username").value
-           this.startCountdown();
-        })
-    }
 
     startCountdown(){
         document.getElementById("counter").style.display = "flex";
-        document.querySelector("#name").style.display = "none";
         let i = 3;
 
         let countdown = setInterval(() => {
@@ -116,13 +132,12 @@ class Typer{
         if(this.word[0] === keypressed && this.word.length > 1 && this.typeWords.length > this.wordsTyped){
             this.word = this.word.slice(1);
             this.drawWord();
-        } else if (this.word[0] === keypressed && this.word.length == 1 && this.wordsTyped <= this.typeWords.length-2){
+        } else if (this.word[0] === keypressed && this.word.length == 1 && this.wordsTyped < this.typeWords.length - 1){
             this.wordsTyped++;
             this.upDateInfo();
             this.selectWord();
-        } else if(this.word[0] === keypressed && this.word.length == 1 && this.typeWords.length-1 == this.wordsTyped){
+        } else if(this.word[0] === keypressed && this.word.length == 1 && this.typeWords.length - 1 == this.wordsTyped){
             this.upDateInfo();
-            this.wordsTyped = 0;
             this.endGame();
         } else if(this.word[0] != keypressed){
             document.getElementById("word").style.color = "red";
@@ -137,7 +152,7 @@ class Typer{
         this.score = ((this.endTime - this.startTime) / 1000).toFixed(2);
         document.getElementById("word").innerHTML = "Mäng läbi. Sinu aeg on: " + this.score + " sekundit.";
         window.removeEventListener("keypress", this.keyListener)
-        this.loadResultsFromFile();
+        this.saveResult();
     }
 
     async saveResult(){
@@ -145,35 +160,13 @@ class Typer{
             name: this.name,
             time: this.score
         }
-
-        console.log(typeof(this.results))
-        console.log(this.results)
-
-        this.results.push(result);
-        this.results.sort((a, b) => parseFloat(a.time) - parseFloat(b.time));
-        localStorage.setItem("score", JSON.stringify(this.results));
-
-        try{
-            await fetch("server.php", {
-                method: "POST",
-                headers: {"Content-Type" : "application/x-www-form-urlencoded"},
-                body: "save=" + encodeURIComponent(JSON.stringify(this.results))
-            });
-            console.log("success" + encodeURIComponent(JSON.stringify(this.results)))
-        } catch(err){
-            alert("Failed " + err)
-        } finally{
-            console.log("päring lõpetud")
-            this.loadResults();
-        }
-
-        console.log(this.results);
-
+        const dbRef = ref(db, 'results');
+        push(dbRef, result);
     }
 
     generateWords(){
         for(let i=0; i<this.wordsInGame; i++){
-            const len = this.wordsInGame + i;
+            const len = this.startingWordLength + i;
             const randomIndex = Math.floor(Math.random() * this.words[len].length);
             this.typeWords[i] = this.words[len][randomIndex];
         }
@@ -196,4 +189,61 @@ class Typer{
     }
 }
 
-let typer = new Typer();
+let typer;
+
+document.getElementById("login").addEventListener("click", () => {
+    login().then(name => {
+        typer = new Typer(name);
+       
+    });
+});
+
+/* --------------------
+edetabel koguaeg, muidu klassi sees ei tööta nii nagu vaja
+---------------*/
+const dbRef = ref(db, 'results');
+
+onValue(dbRef, (snapshot) =>{
+    const resultDiv = document.getElementById("results");
+    resultDiv.innerHTML = ""; 
+    
+    let firebaseResults = [];
+    
+    snapshot.forEach((childSnapshot) => {
+        firebaseResults.push(childSnapshot.val());
+    });
+    
+    firebaseResults.sort((a, b) => parseFloat(a.time) - parseFloat(b.time));
+    firebaseResults = firebaseResults.slice(0, 20);
+    for(let i = 0; i < firebaseResults.length; i++){
+        const row = document.createElement("div");
+        row.textContent = `${i+1}. ${firebaseResults[i].name} ${firebaseResults[i].time}`;
+        resultDiv.appendChild(row);
+    }
+});
+
+
+/*modali asjad*/
+
+window.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById("resultsMod");
+    const openBut = document.getElementById("open");
+    const closeBut = document.getElementById("close");
+
+    if (openBut && modal && closeBut){
+        openBut.addEventListener('click', () => {
+            modal.style.display = "block";
+            console.log("Modal avatud");
+        });
+
+        closeBut.addEventListener('click', () =>{
+            modal.style.display = "none";
+        });
+
+        window.addEventListener('click', (event) => {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        });
+    }
+});

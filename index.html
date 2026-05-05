@@ -3,15 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="typer.js" defer></script>
+    <script type="module" src="typer.js" defer></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="style.css">
     <title>Typer</title>
 </head>
 <body>
-    <div id="name" class="container">
-        <label for="name">Sisesta oma nimi</label>
-        <input type="text" id="username">
-        <input type="button" value="Salvesta" id="submitname">
+    <div id="loginContainer" class="container">
+        <h2>Tere tulemast!</h2>
+        <button id="login">Logi sisse Google'iga</button>
     </div>
 
     <div id="counter" class="container">
@@ -27,11 +30,16 @@
         <div id="score"></div>
     </div>
 
-    <div id="resultsContainer" class="container">
+    <button id="open">Vaata edetabelit</button>
+
+    <div id="resultsMod" class="modal">
+        <div class="modal-content">
+        <span id="close" style="cursor:pointer; float:right;">&times; Sulge</span>
         <h2>TOP 20</h2>
-        <div id="results">
-        </div>
-    </div>
+    
+        <div id="results"></div>
+  </div>
+</div>
     
 </body>
 </html>

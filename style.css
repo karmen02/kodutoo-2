@@ -1,6 +1,10 @@
 body{
     margin:0;
     padding:0;
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 700; 
+    margin-bottom: 15px; 
+    background-color: #ac9694;
 }
 
 .container{
@@ -26,9 +30,170 @@ body{
 #word, #time{
     font-size: 36px;
     font-weight: 700;
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 400; 
+    font-size: 32px; 
+    margin-bottom: 15px; 
 }
 
 #info{
     min-height: 30px;
     align-items: start;
+}
+
+#loginContainer h2{
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 500; 
+    font-size: 40px; 
+    margin-bottom: 15px; 
+}
+#login{
+    font-family: "Chakra Petch", sans-serif;
+    font-weight: 550; 
+    font-size: 15px; 
+    margin-bottom: 15px; 
+    cursor: pointer;
+}
+
+/*Buttoni tüüp on võetud siit: https://getcssscan.com/css-buttons-examples, veidi muudetud et sobiks. Leheküljel: Button 56*/
+
+/* googlei login nupp*/
+#loginContainer {
+    position: relative;
+    z-index: 1;
+}
+
+#login {
+  align-items: center;
+  background-color: #fee6e3;
+  border: 2px solid #111;
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: #111;
+  cursor: pointer;
+  display: flex;
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  height: 48px;
+  justify-content: center;
+  line-height: 24px;
+  max-width: 100%;
+  padding: 0 25px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+#login:after {
+  background-color: #111;
+  border-radius: 8px;
+  content: "";
+  display: block;
+  height: 48px;
+  left: 0;
+  width: 100%;
+  position: absolute;
+  top: -2px;
+  transform: translate(8px, 8px);
+  transition: transform .2s ease-out;
+  z-index: -1;
+}
+
+#login:hover:after {
+  transform: translate(0, 0);
+}
+
+#login:active {
+  background-color: #ffdeda;
+  outline: 0;
+}
+
+#login:hover {
+  outline: 0;
+}
+
+@media (min-width: 768px) {
+  #login {
+    padding: 0 40px;
+  }
+}
+
+/* Modali nupp */
+#open {
+  align-items: center;
+  background-color: #fee6e3;
+  border: 2px solid #111;
+  border-radius: 8px;
+  box-sizing: border-box;
+  color: #111;
+  cursor: pointer;
+  display: flex;
+  font-family: "Chakra Petch", sans-serif;
+  font-weight: 600;
+  font-size: 14px; 
+  height: 36px;   
+  justify-content: center;
+  line-height: 20px;
+  max-width: 100%;
+  padding: 0 15px; 
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  touch-action: manipulation;
+  margin-top: 20px; 
+}
+
+#open:after {
+  background-color: #111;
+  border-radius: 8px;
+  content: "";
+  display: block;
+  height: 36px;  
+  left: 0;
+  width: 100%;
+  position: absolute;
+  top: -2px;
+  transform: translate(4px, 4px); 
+  transition: transform .2s ease-out;
+  z-index: -1;
+}
+
+#open:hover:after {
+  transform: translate(0, 0);
+}
+
+#open:active {
+  background-color: #ecd7f0;
+  outline: 0;
+}
+
+#open:hover {
+  outline: 0;
+}
+/* Siin lõppeb leheküljelt võetud buttoni CSS*/ 
+
+
+.modal {
+    display: none; 
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8); 
+}
+
+.modal-content {
+    background-color: #ac9694;
+    margin: 10% auto;
+    padding: 20px;
+    width: 60%;
+    border-radius: 10px;
+    color: black;
 }
